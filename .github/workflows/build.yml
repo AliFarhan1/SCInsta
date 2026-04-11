@@ -1,0 +1,50 @@
+name: Build SCInsta
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ ci-actions-setup ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install ldid xz make gnu-sed
+
+      - name: Setup Theos
+        run: |
+          git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
+          echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/theos/bin" >> $GITHUB_PATH
+
+      - name: Download iPhoneOS SDK
+        run: |
+          mkdir -p "$THEOS/sdks"
+          curl -L https://github.com/theos/sdks/releases/download/2024.10.27/iPhoneOS17.5.sdk.tar.xz -o /tmp/iPhoneOS17.5.sdk.tar.xz
+          tar -xJf /tmp/iPhoneOS17.5.sdk.tar.xz -C "$THEOS/sdks"
+
+      - name: Build package
+        env:
+          THEOS: ${{ env.THEOS }}
+        run: |
+          make clean || true
+          make package FINALPACKAGE=1
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCInsta-packages
+          path: |
+            packages/*.deb
+            packages/*.ipa
