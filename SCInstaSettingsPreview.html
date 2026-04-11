@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCInsta Settings</title>
+  <style>
+    :root{
+      --bg:#000000;
+      --card:#121212;
+      --card-2:#1b1b1b;
+      --text:#ffffff;
+      --sub:#a8a8a8;
+      --line:#262626;
+      --accent:#0095f6;
+      --accent-2:#ff2d55;
+      --green:#34c759;
+      --shadow:0 10px 30px rgba(0,0,0,.28);
+      --radius:22px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;
+      background:radial-gradient(circle at top right, rgba(255,45,85,.12), transparent 24%),radial-gradient(circle at top left, rgba(0,149,246,.12), transparent 28%),var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .app{max-width:430px;margin:0 auto;padding:18px 14px 40px;}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 20px;}
+    .brand{display:flex;align-items:center;gap:12px;}
+    .logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);font-size:20px;font-weight:700;}
+    .brand-text h1{margin:0;font-size:22px;letter-spacing:.2px;}
+    .brand-text p{margin:4px 0 0;color:var(--sub);font-size:13px;}
+    .pill{padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:var(--sub);background:rgba(255,255,255,.03);font-size:12px;}
+    .hero{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.06);border-radius:28px;padding:18px;box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden;position:relative;}
+    .hero::after{content:"";position:absolute;inset:auto -40px -40px auto;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle, rgba(0,149,246,.3), transparent 65%);filter:blur(6px);}
+    .hero h2{margin:0 0 8px;font-size:18px;}
+    .hero p{margin:0;color:var(--sub);line-height:1.7;font-size:14px;}
+    .section{margin-top:18px;}
+    .section-title{display:flex;align-items:center;justify-content:space-between;margin:0 4px 12px;}
+    .section-title h3{margin:0;font-size:15px;color:#f5f5f5;}
+    .section-title span{color:var(--sub);font-size:12px;}
+    .card{background:linear-gradient(180deg,var(--card),var(--card-2));border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+    .row{display:flex;align-items:center;gap:12px;padding:16px 14px;border-bottom:1px solid var(--line);}
+    .row:last-child{border-bottom:none;}
+    .icon{width:42px;height:42px;min-width:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.05);}
+    .content{flex:1;min-width:0;}
+    .title{font-size:15px;font-weight:600;margin-bottom:4px;}
+    .subtitle{color:var(--sub);font-size:12.5px;line-height:1.5;}
+    .arrow{color:#7c7c7c;font-size:18px;margin-right:6px;}
+    .switch{position:relative;width:54px;height:32px;min-width:54px;}
+    .switch input{display:none;}
+    .slider{position:absolute;inset:0;background:#2d2d2d;border-radius:999px;transition:.25s ease;border:1px solid rgba(255,255,255,.08);}
+    .slider::before{content:"";position:absolute;width:26px;height:26px;right:3px;top:2px;border-radius:50%;background:white;transition:.25s ease;box-shadow:0 4px 10px rgba(0,0,0,.3);}
+    .switch input:checked + .slider{background:var(--accent);}
+    .switch input:checked + .slider::before{transform:translateX(-22px);}
+    .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(52,199,89,.12);color:#8ff0a4;border:1px solid rgba(52,199,89,.18);padding:6px 10px;border-radius:999px;font-size:12px;margin-top:10px;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .mini{background:linear-gradient(180deg,var(--card),var(--card-2));border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:16px;box-shadow:var(--shadow);}
+    .mini .mini-icon{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.05);margin-bottom:12px;font-size:18px;}
+    .mini h4{margin:0 0 6px;font-size:14px;}
+    .mini p{margin:0;color:var(--sub);font-size:12px;line-height:1.6;}
+    .footer{margin-top:20px;color:var(--sub);font-size:12px;text-align:center;line-height:1.8;padding-bottom:18px;}
+    .danger{color:#ff6b81;}
+    .accent{color:#7dc7ff;}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">S</div>
+        <div class="brand-text">
+          <h1>SCInsta</h1>
+          <p>واجهة حديثة مستوحاة من إنستغرام</p>
+        </div>
+      </div>
+      <div class="pill">vNext UI</div>
+    </div>
+
+    <div class="hero">
+      <h2>إعدادات الأداة</h2>
+      <p>تصميم جديد أكثر أناقة وتنظيمًا، ببطاقات دائرية داكنة، مفاتيح تبديل حديثة، وأسلوب قريب من واجهة إنستغرام الرسمية.</p>
+      <div class="badge">● الواجهة التجريبية مفعلة</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><h3>الميزات الأساسية</h3><span>Core Features</span></div>
+      <div class="card">
+        <div class="row"><div class="icon">⬇️</div><div class="content"><div class="title">تنزيل المحتوى</div><div class="subtitle">تحميل الصور والفيديو والريلز بشكل مباشر من التطبيق.</div></div><label class="switch"><input type="checkbox" checked /><span class="slider"></span></label></div>
+        <div class="row"><div class="icon">🚫</div><div class="content"><div class="title">إخفاء الإعلانات</div><div class="subtitle">تقليل العناصر المزعجة داخل الخلاصة والصفحات المقترحة.</div></div><label class="switch"><input type="checkbox" checked /><span class="slider"></span></label></div>
+        <div class="row"><div class="icon">🎬</div><div class="content"><div class="title">تحسين الريلز</div><div class="subtitle">إضافة أزرار أسرع ووصول أسهل لأدوات الفيديو.</div></div><label class="switch"><input type="checkbox" /><span class="slider"></span></label></div>
+        <div class="row"><div class="icon">✨</div><div class="content"><div class="title">واجهة أنظف</div><div class="subtitle">إخفاء بعض العناصر الزائدة للحصول على مظهر أبسط.</div></div><span class="arrow">‹</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><h3>الخصوصية والمظهر</h3><span>Privacy & UI</span></div>
+      <div class="card">
+        <div class="row"><div class="icon">🌙</div><div class="content"><div class="title">الوضع الداكن المحسن</div><div class="subtitle">ألوان أعمق وتباين أقرب لأسلوب إنستغرام الحديث.</div></div><label class="switch"><input type="checkbox" checked /><span class="slider"></span></label></div>
+        <div class="row"><div class="icon">🧩</div><div class="content"><div class="title">تخصيص الأزرار</div><div class="subtitle">إعادة ترتيب بعض الخيارات بما يناسب استخدامك.</div></div><span class="arrow">‹</span></div>
+        <div class="row"><div class="icon">🔔</div><div class="content"><div class="title">سلوك الإشعارات</div><div class="subtitle">التحكم بمظهر وتفعيل الخيارات المرتبطة بالتنبيهات.</div></div><span class="arrow">‹</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><h3>اختصارات</h3><span>Quick Access</span></div>
+      <div class="grid">
+        <div class="mini"><div class="mini-icon">🎨</div><h4>الثيمات</h4><p>تبديل سريع بين أنماط تصميم مستقبلية للأداة.</p></div>
+        <div class="mini"><div class="mini-icon">⚙️</div><h4>الإعدادات المتقدمة</h4><p>خيارات إضافية للمستخدم المتقدم وتنظيم الأداة.</p></div>
+        <div class="mini"><div class="mini-icon">📦</div><h4>إدارة المزايا</h4><p>عرض كل ميزة بشكل بطاقات منظمة وواضحة.</p></div>
+        <div class="mini"><div class="mini-icon">🛠️</div><h4>وضع المطور</h4><p>قسم خاص بالخصائص التجريبية والتبديلات المؤقتة.</p></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      SCInsta UI Concept<br>
+      تصميم مرجعي لتحويله لاحقًا إلى <span class="accent">UIViewController</span> أو <span class="accent">UITableView</span><br>
+      <span class="danger">هذا الملف للمعاينة الشكلية فقط</span>
+    </div>
+  </div>
+</body>
+</html>
