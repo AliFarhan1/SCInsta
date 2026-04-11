@@ -25,13 +25,13 @@ static char rowStaticRef[] = "row";
         NSMutableArray *mutableSections = [sections mutableCopy];
         
         [mutableSections enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *section, NSUInteger index, BOOL *stop) {
-        
+            
             if ([section[@"header"] hasPrefix:@"_"] && [section[@"footer"] hasPrefix:@"_"]) {
                 if (![[SCIUtils IGVersionString] isEqualToString:@"0.0.0"]) {
                     [mutableSections removeObjectAtIndex:index];
                 }
             }
-
+            
             else if ([section[@"header"] isEqualToString:@"Experimental"]) {
                 if (![[SCIUtils IGVersionString] hasSuffix:@"-dev"]) {
                     [mutableSections removeObjectAtIndex:index];
@@ -42,7 +42,6 @@ static char rowStaticRef[] = "row";
         
         self.sections = [mutableSections copy];
     }
-    
     
     return self;
 }
@@ -55,15 +54,49 @@ static char rowStaticRef[] = "row";
     [super viewDidLoad];
 
     self.navigationController.navigationBar.prefersLargeTitles = NO;
-    self.view.backgroundColor = UIColor.systemBackgroundColor;
+    self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeNever;
+
+    if (@available(iOS 13.0, *)) {
+        self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+    }
+
+    self.view.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:1.0];
 
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleInsetGrouped];
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.tableView.dataSource = self;
-    self.tableView.contentInset = UIEdgeInsetsMake(self.reduceMargin ? -30 : -10, 0, 0, 0);
     self.tableView.delegate = self;
+    self.tableView.contentInset = UIEdgeInsetsMake(self.reduceMargin ? -18 : 0, 0, 18, 0);
+    self.tableView.backgroundColor = UIColor.clearColor;
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    self.tableView.separatorColor = [UIColor colorWithWhite:1.0 alpha:0.08];
+    self.tableView.showsVerticalScrollIndicator = NO;
+
+    if (@available(iOS 15.0, *)) {
+        self.tableView.sectionHeaderTopPadding = 8.0;
+    }
 
     [self.view addSubview:self.tableView];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+
+    UINavigationBar *navigationBar = self.navigationController.navigationBar;
+    navigationBar.tintColor = UIColor.whiteColor;
+
+    if (@available(iOS 13.0, *)) {
+        UINavigationBarAppearance *appearance = [[UINavigationBarAppearance alloc] init];
+        [appearance configureWithOpaqueBackground];
+        appearance.backgroundColor = [UIColor colorWithRed:0.02 green:0.02 blue:0.03 alpha:1.0];
+        appearance.titleTextAttributes = @{ NSForegroundColorAttributeName: UIColor.whiteColor };
+        appearance.largeTitleTextAttributes = @{ NSForegroundColorAttributeName: UIColor.whiteColor };
+        appearance.shadowColor = [UIColor colorWithWhite:1.0 alpha:0.06];
+
+        navigationBar.standardAppearance = appearance;
+        navigationBar.scrollEdgeAppearance = appearance;
+        navigationBar.compactAppearance = appearance;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -81,12 +114,11 @@ static char rowStaticRef[] = "row";
         UIViewController *presenter = self.presentingViewController;
         [presenter presentViewController:alert animated:YES completion:nil];
         
-        // Done with first-time setup for this version
         [[NSUserDefaults standardUserDefaults] setValue:SCIVersionString forKey:@"SCInstaFirstRun"];
     }
 }
 
-// MARK: - UITableViewDataSource
+#pragma mark - UITableViewDataSource
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     SCISetting *row = self.sections[indexPath.section][@"rows"][indexPath.row];
@@ -95,24 +127,31 @@ static char rowStaticRef[] = "row";
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
     UIListContentConfiguration *cellContentConfig = cell.defaultContentConfiguration;
     
-    cellContentConfig.text = row.title;
+    cell.backgroundColor = [UIColor colorWithRed:0.10 green:0.10 blue:0.11 alpha:1.0];
+    cell.clipsToBounds = YES;
     
-    // Subtitle
+    cellContentConfig.text = row.title;
+    cellContentConfig.textProperties.color = UIColor.whiteColor;
+    cellContentConfig.textProperties.font = [UIFont systemFontOfSize:16 weight:UIFontWeightSemibold];
+    cellContentConfig.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(12, 4, 12, 6);
+    cellContentConfig.imageToTextPadding = 14;
+    
     if (row.subtitle.length) {
         cellContentConfig.secondaryText = row.subtitle;
+        cellContentConfig.secondaryTextProperties.color = [UIColor colorWithWhite:1.0 alpha:0.60];
+        cellContentConfig.secondaryTextProperties.font = [UIFont systemFontOfSize:12.5 weight:UIFontWeightRegular];
         cellContentConfig.textToSecondaryTextVerticalPadding = 4.5;
     }
     
-    // Icon
     if (row.icon != nil) {
         cellContentConfig.image = [row.icon image];
         cellContentConfig.imageProperties.tintColor = row.icon.color;
+        cellContentConfig.imageProperties.maximumSize = CGSizeMake(22, 22);
+        cellContentConfig.imageProperties.cornerRadius = 8.0;
     }
     
-    // Image url
     if (row.imageUrl != nil) {
         [self loadImageFromURL:row.imageUrl atIndexPath:indexPath forTableView:tableView];
-        
         cellContentConfig.imageToTextPadding = 14;
     }
     
@@ -123,14 +162,13 @@ static char rowStaticRef[] = "row";
         }
             
         case SCITableCellLink: {
-            cellContentConfig.textProperties.color = [UIColor systemBlueColor];
-            cellContentConfig.textProperties.font = [UIFont systemFontOfSize:[UIFont preferredFontForTextStyle:UIFontTextStyleBody].pointSize
-                                                                      weight:UIFontWeightMedium];
+            cellContentConfig.textProperties.color = [UIColor colorWithRed:0.38 green:0.72 blue:1.0 alpha:1.0];
+            cellContentConfig.textProperties.font = [UIFont systemFontOfSize:16 weight:UIFontWeightSemibold];
             
             cell.selectionStyle = UITableViewCellSelectionStyleDefault;
             
-            UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:@"safari"]];
-            imageView.tintColor = [UIColor systemGray3Color];
+            UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:@"arrow.up.right.square"]];
+            imageView.tintColor = [UIColor colorWithWhite:1.0 alpha:0.45];
             cell.accessoryView = imageView;
             
             break;
@@ -142,7 +180,6 @@ static char rowStaticRef[] = "row";
             toggle.onTintColor = [SCIUtils SCIColor_Primary];
             
             objc_setAssociatedObject(toggle, rowStaticRef, row, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            
             [toggle addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
             
             cell.accessoryView = toggle;
@@ -158,14 +195,15 @@ static char rowStaticRef[] = "row";
             stepper.value = [[NSUserDefaults standardUserDefaults] doubleForKey:row.defaultsKey];
             
             objc_setAssociatedObject(stepper, rowStaticRef, row, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            
             [stepper addTarget:self
                         action:@selector(stepperChanged:)
               forControlEvents:UIControlEventValueChanged];
             
-            // Template subtitle
             if (row.subtitle.length) {
-                cellContentConfig.secondaryText = [self formatString:row.subtitle withValue:stepper.value label:row.label singularLabel:row.singularLabel];
+                cellContentConfig.secondaryText = [self formatString:row.subtitle
+                                                           withValue:stepper.value
+                                                               label:row.label
+                                                       singularLabel:row.singularLabel];
             }
             
             cell.accessoryView = stepper;
@@ -181,15 +219,15 @@ static char rowStaticRef[] = "row";
         case SCITableCellMenu: {
             UIButton *menuButton = [UIButton buttonWithType:UIButtonTypeSystem];
             [menuButton setTitle:@"•••" forState:UIControlStateNormal];
+            [menuButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
             menuButton.menu = [row menuForButton:menuButton];
             menuButton.showsMenuAsPrimaryAction = YES;
             menuButton.titleLabel.font = [UIFont systemFontOfSize:[UIFont preferredFontForTextStyle:UIFontTextStyleBody].pointSize
-                                                           weight:UIFontWeightMedium];
+                                                           weight:UIFontWeightSemibold];
             
             UIButtonConfiguration *config = menuButton.configuration ?: [UIButtonConfiguration plainButtonConfiguration];
-            menuButton.configuration.contentInsets = NSDirectionalEdgeInsetsMake(8, 8, 8, 8);
+            config.contentInsets = NSDirectionalEdgeInsetsMake(8, 8, 8, 8);
             menuButton.configuration = config;
-
             [menuButton sizeToFit];
             
             cell.accessoryView = menuButton;
@@ -204,7 +242,6 @@ static char rowStaticRef[] = "row";
     }
     
     cell.contentConfiguration = cellContentConfig;
-
     return cell;
 }
 
@@ -224,7 +261,32 @@ static char rowStaticRef[] = "row";
     return self.sections.count;
 }
 
-// MARK: - UITableViewDelegate
+#pragma mark - UITableViewDelegate
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    NSString *title = [self tableView:tableView titleForHeaderInSection:section];
+    if (title.length == 0) return nil;
+    
+    UIView *container = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 34)];
+    
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(20, 8, tableView.bounds.size.width - 40, 22)];
+    label.text = title.uppercaseString;
+    label.font = [UIFont systemFontOfSize:12 weight:UIFontWeightSemibold];
+    label.textColor = [UIColor colorWithWhite:1.0 alpha:0.45];
+    
+    [container addSubview:label];
+    return container;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    NSString *title = [self tableView:tableView titleForHeaderInSection:section];
+    return title.length ? 34.0 : 0.01;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    NSString *title = [self tableView:tableView titleForFooterInSection:section];
+    return title.length ? 28.0 : 0.01;
+}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     SCISetting *row = self.sections[indexPath.section][@"rows"][indexPath.row];
@@ -252,7 +314,7 @@ static char rowStaticRef[] = "row";
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-// MARK: - Actions
+#pragma mark - Actions
 
 - (void)switchChanged:(UISwitch *)sender {
     SCISetting *row = objc_getAssociatedObject(sender, rowStaticRef);
@@ -288,25 +350,21 @@ static char rowStaticRef[] = "row";
     }
 }
 
-// MARK: - Helper
+#pragma mark - Helper
 
 - (NSString *)formatString:(NSString *)template withValue:(double)value label:(NSString *)label singularLabel:(NSString *)singularLabel {
-    // Singular or plural labels
     NSString *applicableLabel = fabs(value - 1.0) < 0.00001 ? singularLabel : label;
     
-    // Force value to 0 to prevent it being -0
     if (fabs(value) < 0.00001) {
         value = 0.0;
     }
 
-    // Get correct decimal value based on step value
     NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
     formatter.numberStyle = NSNumberFormatterDecimalStyle;
     formatter.minimumFractionDigits = 0;
     formatter.maximumFractionDigits = [SCIUtils decimalPlacesInDouble:value];
 
     NSString *stringValue = [formatter stringFromNumber:@(value)];
-
     return [NSString stringWithFormat:template, stringValue, applicableLabel];
 }
 
@@ -323,17 +381,16 @@ static char rowStaticRef[] = "row";
     [self.tableView reloadRowsAtIndexPaths:@[indexPath]
                           withRowAnimation:animated ? UITableViewRowAnimationAutomatic : UITableViewRowAnimationNone];
 }
+
 - (void)reloadCellForView:(UIView *)view {
     [self reloadCellForView:view animated:NO];
 }
 
-- (void)loadImageFromURL:(NSURL *)url atIndexPath:(NSIndexPath *)indexPath forTableView:(UITableView *)tableView
-{
+- (void)loadImageFromURL:(NSURL *)url atIndexPath:(NSIndexPath *)indexPath forTableView:(UITableView *)tableView {
     if (!url) return;
 
     NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:url
-                                                             completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
-    {
+                                                             completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (!data || error) return;
 
         UIImage *image = [UIImage imageWithData:data];
@@ -346,6 +403,7 @@ static char rowStaticRef[] = "row";
             UIListContentConfiguration *config = (UIListContentConfiguration *)cell.contentConfiguration;
             config.image = image;
             config.imageProperties.maximumSize = CGSizeMake(45, 45);
+            config.imageProperties.cornerRadius = 10.0;
             cell.contentConfiguration = config;
         });
     }];
